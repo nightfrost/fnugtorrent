@@ -1,4 +1,4 @@
-package main
+package bencode
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	"github.com/jackpal/bencode-go"
 )
 
-func decodeTorrentFile(filePath string) (map[string]any, error) {
+func DecodeTorrentFile(filePath string) (map[string]any, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func decodeTorrentFile(filePath string) (map[string]any, error) {
 	return result, nil
 }
 
-func calculateInfoHash(infoDict any) (string, error) {
+func CalculateInfoHash(infoDict any) (string, error) {
 	var buf bytes.Buffer
 
 	err := bencode.Marshal(&buf, infoDict)

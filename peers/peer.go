@@ -1,6 +1,10 @@
-package main
+package peers
 
-import "net"
+import (
+	"fmt"
+	"io"
+	"net"
+)
 
 func buildHandshake(infoHash string, peerID string) []byte {
 	handshake := make([]byte, 68)
@@ -12,21 +16,48 @@ func buildHandshake(infoHash string, peerID string) []byte {
 }
 
 func readHandshake(conn net.Conn) (string, string, error) {
-	handshake := make([]byte, 68)
-	_, err := conn.Read(handshake)
+	//Length prefix (1)
+	lengthPrefix := make([]byte, 1)
+	_, err := io.ReadFull(conn, lengthPrefix)
 	if err != nil {
-		return "", "", err
+		return "", "", fmt.Errorf("failed to length prefix: %w", err)
 	}
-	if string(handshake[:19]) != "BitTorrent protocol" {
-		return "", "", err
+	if lengthPrefix[0] != 19 {
+		return "", "", fmt.Errorf("invalid protocol identifier length: %d", lengthPrefix[0])
 	}
-	infoHash := string(handshake[28:48])
-	if infoHash == "" {
-		return "", "", err
+
+	//Protocol Identifier (19)
+	protocolIdentifier := make([]byte, 19)
+	_, err = io.ReadFull(conn, protocolIdentifier)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read protocol identifier: %w", err)
 	}
-	peerID := string(handshake[48:68])
-	if peerID == "" {
-		return "", "", err
+	if string(protocolIdentifier) != "BitTorrent protocol" {
+		return "", "", fmt.Errorf("invalid protocol identifier: %s", string(protocolIdentifier))
 	}
+
+	//Reserved (8)
+	reserved := make([]byte, 8)
+	_, err = io.ReadFull(conn, reserved)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read reserved bytes: %w", err)
+	}
+
+	//Info Hash (20)
+	infoHashBytes := make([]byte, 20)
+	_, err = io.ReadFull(conn, infoHashBytes)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read info hash: %w", err)
+	}
+	infoHash := string(infoHashBytes)
+
+	//Peer ID (20)
+	peerIDBytes := make([]byte, 20)
+	_, err = io.ReadFull(conn, infoHashBytes)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to read peer ID: %w", err)
+	}
+	peerID := string(peerIDBytes)
+
 	return infoHash, peerID, nil
 }
