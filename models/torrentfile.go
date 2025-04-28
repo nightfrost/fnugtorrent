@@ -17,3 +17,15 @@ type FileDictionary struct {
 	Length int      `bencode:"length"`
 	Path   []string `bencode:"path"`
 }
+
+type PeerInfo struct {
+	PeerID string `bencode:"peer id"`
+	IP     string `bencode:"ip"`
+	Port   int    `bencode:"port"`
+}
+
+type TrackerResponse struct {
+	Interval      int        `bencode:"interval"`
+	Peers         []PeerInfo `bencode:"peers"`
+	FailureReason string     `bencode:"failure reason"`
+}

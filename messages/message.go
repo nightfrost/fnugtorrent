@@ -20,12 +20,7 @@ const (
 	MsgCancel        = 8
 )
 
-type Message struct {
-	ID      byte
-	Payload []byte
-}
-
-func buildMessage(id byte, payload []byte) []byte {
+func BuildMessage(id byte, payload []byte) []byte {
 	length := uint32(len(payload) + 1) // +1 for the ID
 	buf := bytes.Buffer{}
 	binary.Write(&buf, binary.BigEndian, length)
@@ -34,7 +29,7 @@ func buildMessage(id byte, payload []byte) []byte {
 	return buf.Bytes()
 }
 
-func parseMessage(conn net.Conn) (messageID byte, payload []byte, err error) {
+func ParseMessage(conn net.Conn) (messageID byte, payload []byte, err error) {
 	//Message length (4 bytes, big-endian)
 	lengthBytes := make([]byte, 4)
 	_, err = io.ReadFull(conn, lengthBytes)
