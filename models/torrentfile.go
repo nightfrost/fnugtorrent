@@ -1,7 +1,7 @@
 package models
 
 type TorrentFile struct {
-	Announce string         `bencode:"announce"`
+	Announce string         `bencode:"announcelist"`
 	Info     InfoDictionary `bencode:"info"`
 }
 
@@ -28,4 +28,9 @@ type TrackerResponse struct {
 	Interval      int        `bencode:"interval"`
 	Peers         []PeerInfo `bencode:"peers"`
 	FailureReason string     `bencode:"failure reason"`
+}
+
+type Message struct {
+	ID      byte
+	Payload []byte
 }

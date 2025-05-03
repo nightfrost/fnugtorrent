@@ -86,7 +86,7 @@ func GeneratePeerID() string {
 	return string(src)
 }
 
-func HandlePeers(peers []models.PeerInfo, infoHash string, peerID string, torrentData map[string]any) {
+func HandlePeers(peers []models.PeerInfo, infoHash string, peerID string, torrentData models.TorrentFile) {
 	for _, peer := range peers {
 		go func(peer models.PeerInfo) {
 			addr := net.JoinHostPort(peer.IP, fmt.Sprintf("%d", peer.Port))
@@ -122,7 +122,7 @@ func doHandshake(conn net.Conn, infoHash string, peerID string) error {
 	return err
 }
 
-func downloadFromPeer(conn net.Conn, torrentData map[string]any) {
+func downloadFromPeer(conn net.Conn, torrentData models.TorrentFile) {
 	defer conn.Close()
 
 	interestedMsg := messages.BuildMessage(messages.MsgInterested, []byte{})
@@ -144,10 +144,10 @@ func downloadFromPeer(conn net.Conn, torrentData map[string]any) {
 	}
 	availablePieces := utils.BytesToBitfield(bitfield)
 
-	infoDict := torrentData["info"].(map[string]any)
+	infoDict := torrentData.Info
 	totalLength := utils.GetTotalLength(infoDict)
-	pieceLength := infoDict["piece length"].(int)
-	piecesHashes := infoDict["pieces"].(string)
+	pieceLength := infoDict.PieceLength
+	piecesHashes := infoDict.Pieces
 	numPieces := len(piecesHashes) / 20
 
 	outputFile, err := utils.CreateOutPutFile(infoDict)

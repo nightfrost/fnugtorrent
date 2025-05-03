@@ -7,22 +7,23 @@ import (
 	"os"
 
 	"github.com/jackpal/bencode-go"
+	"nightfrost.com/fnugtorrent/models"
 )
 
-func DecodeTorrentFile(filePath string) (map[string]any, error) {
+func DecodeTorrentFile(filePath string) (*models.TorrentFile, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	result := make(map[string]any)
+	var torrentFile models.TorrentFile
 
-	err = bencode.Unmarshal(file, &result)
+	err = bencode.Unmarshal(file, &torrentFile)
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	return &torrentFile, nil
 }
 
 func CalculateInfoHash(infoDict any) (string, error) {

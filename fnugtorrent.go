@@ -18,28 +18,22 @@ func main() {
 		fmt.Println("Error decoding torrent file:", err)
 		return
 	}
-
-	//calculate info-hash from dict
-	infoDict, ok := torrentData["info"]
-	if !ok {
-		fmt.Println("No 'info' section found in the torrent file")
+	if torrentData == nil {
+		fmt.Println("Decoded .torrent file, but it seems to be empty.")
 		return
 	}
-	infoHash, err := bencode.CalculateInfoHash(infoDict)
+
+	//calculate info-hash from dict
+	infoHash, err := bencode.CalculateInfoHash(torrentData.Info)
 	if err != nil {
 		fmt.Println("Error calculating info hash:", err)
 		return
 	}
 
 	//setup tracker request
-	trackerURL, ok := torrentData["announce"].(string)
-	if !ok {
-		fmt.Println("Error: 'announce' not found in torrent file or is not a string")
-		return
-	}
 	peerID := peers.GeneratePeerID()
 	port := 6881
-	trackerRequestURL, err := trackers.BuildInitialTrackerRequest(trackerURL, infoHash, peerID, port, "started")
+	trackerRequestURL, err := trackers.BuildInitialTrackerRequest(torrentData.Announce, infoHash, peerID, port, "started")
 	if err != nil {
 		fmt.Println("Error processing tracker request:", err)
 		return
@@ -55,8 +49,11 @@ func main() {
 	if err != nil {
 		fmt.Println("Error processing tracker response:", err)
 	}
+	fmt.Println("Tracker Response:", trackerResponse)
 
-	go peers.HandlePeers(trackerResponse.Peers, infoHash, peerID, torrentData)
+	fmt.Print("Handle Peer")
+
+	go peers.HandlePeers(trackerResponse.Peers, infoHash, peerID, *torrentData)
 
 	select {}
 }

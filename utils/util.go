@@ -1,27 +1,30 @@
 package utils
 
-import "os"
+import (
+	"os"
+
+	"nightfrost.com/fnugtorrent/models"
+)
 
 func BytesToBitfield(bitfield []byte) []byte {
 	return append([]byte{}, bitfield...)
 }
 
-func GetTotalLength(infoDict map[string]any) int {
-	if length, ok := infoDict["length"].(int64); ok {
-		return int(length)
+func GetTotalLength(infoDict models.InfoDictionary) int {
+	if infoDict.Length != 0 {
+		return infoDict.Length
 	}
 
 	totalLength := 0
-	files := infoDict["files"].([]interface{})
+	files := infoDict.Files
 	for _, file := range files {
-		fileDict := file.(map[string]any)
-		totalLength += int(fileDict["length"].(int64))
+		totalLength += file.Length
 	}
 	return totalLength
 }
 
-func CreateOutPutFile(infoDict map[string]any) (*os.File, error) {
-	fileName := infoDict["name"].(string)
+func CreateOutPutFile(infoDict models.InfoDictionary) (*os.File, error) {
+	fileName := infoDict.Name
 
 	file, err := os.Create(fileName)
 	if err != nil {
