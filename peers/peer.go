@@ -3,6 +3,7 @@ package peers
 import (
 	"crypto/rand"
 	"crypto/sha1"
+	"encoding/base32"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -78,12 +79,9 @@ func readHandshake(conn net.Conn) (string, string, error) {
 
 // Borrowed from crypto/rand.Text() function. However, we only need 20 bytes.
 func GeneratePeerID() string {
-	src := make([]byte, 20)
-	rand.Read(src)
-	for i := range src {
-		src[i] = base32alphabet[src[i]%32]
-	}
-	return string(src)
+	randomBytes := make([]byte, 16) // Use 16 bytes for better randomness (results in 20 base32 chars)
+	rand.Read(randomBytes)
+	return base32.StdEncoding.EncodeToString(randomBytes)[:20] // Take the first 20 chars
 }
 
 func HandlePeers(peers []models.PeerInfo, infoHash string, peerID string, torrentData models.TorrentFile) {

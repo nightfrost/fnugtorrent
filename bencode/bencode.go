@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/jackpal/bencode-go"
@@ -26,12 +27,12 @@ func DecodeTorrentFile(filePath string) (*models.TorrentFile, error) {
 	return &torrentFile, nil
 }
 
-func CalculateInfoHash(infoDict any) (string, error) {
+func CalculateInfoHash(info any) (string, error) { // Take interface{}
 	var buf bytes.Buffer
 
-	err := bencode.Marshal(&buf, infoDict)
+	err := bencode.Marshal(&buf, info) // Marshal the interface{}
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("bencode marshal error: %w", err)
 	}
 
 	hash := sha1.Sum(buf.Bytes())
