@@ -2,6 +2,7 @@ package trackers
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -18,8 +19,8 @@ func BuildInitialTrackerRequest(trackerUrl string, infoHash string, peerID strin
 	}
 
 	params := url.Values{}
-	params.Set("info_hash", string(infoHash))
-	params.Set("peer_id", peerID)
+	params.Set("info_hash", url.QueryEscape(infoHash))
+	params.Set("peer_id", url.QueryEscape(peerID))
 	params.Set("port", strconv.Itoa(port))
 	params.Set("uploaded", strconv.Itoa(0))
 	params.Set("downloaded", strconv.Itoa(0))
@@ -48,6 +49,7 @@ func ProcessTrackerRequest(trackerRequestUrl string) ([]byte, error) {
 }
 
 func ProcessTrackerResponse(responseBody []byte) (models.TrackerResponse, error) {
+	fmt.Printf("Raw Tracker Response:\n%s\n", string(responseBody))
 	var result models.TrackerResponse
 	err := bencode.Unmarshal(bytes.NewReader(responseBody), &result)
 	if err != nil {
