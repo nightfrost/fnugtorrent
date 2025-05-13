@@ -1,7 +1,7 @@
 package models
 
 type TorrentFile struct {
-	Announce string         `bencode:"announcelist"`
+	Announce string         `bencode:"announce"`
 	Info     InfoDictionary `bencode:"info"`
 }
 
@@ -10,6 +10,7 @@ type InfoDictionary struct {
 	PieceLength int              `bencode:"piece length"`
 	Pieces      string           `bencode:"pieces"`
 	Length      int              `bencode:"length"`
+	Private     int              `bencode:"private"`
 	Files       []FileDictionary `bencode:"files"`
 }
 

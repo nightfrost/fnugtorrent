@@ -143,7 +143,7 @@ func downloadFromPeer(conn net.Conn, torrentData models.TorrentFile) {
 	availablePieces := utils.BytesToBitfield(bitfield)
 
 	infoDict := torrentData.Info
-	totalLength := utils.GetTotalLength(infoDict)
+	totalLength := infoDict.Length
 	pieceLength := infoDict.PieceLength
 	piecesHashes := infoDict.Pieces
 	numPieces := len(piecesHashes) / 20

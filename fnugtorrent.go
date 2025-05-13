@@ -22,7 +22,11 @@ func main() {
 		fmt.Println("Decoded .torrent file, but it seems to be empty.")
 		return
 	}
-	fmt.Println("Decoded .torrent file successfully. Body:\n", torrentData)
+	fmt.Println("Name: ", torrentData.Info.Name)
+	fmt.Println("Announce: ", torrentData.Announce)
+	fmt.Println("Piece Length: ", torrentData.Info.PieceLength)
+	fmt.Println("Length: ", torrentData.Info.Length)
+	fmt.Println("private: ", torrentData.Info.Private)
 
 	//calculate info-hash from dict
 	infoHash, err := bencode.CalculateInfoHash(torrentData.Info)
@@ -51,6 +55,7 @@ func main() {
 	trackerResponse, err := trackers.ProcessTrackerResponse(trackerResponseBytes)
 	if err != nil {
 		fmt.Println("Error processing tracker response:", err)
+		return
 	}
 	fmt.Println("Tracker Response:", trackerResponse)
 

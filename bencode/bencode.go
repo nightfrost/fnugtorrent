@@ -27,10 +27,11 @@ func DecodeTorrentFile(filePath string) (*models.TorrentFile, error) {
 	return &torrentFile, nil
 }
 
-func CalculateInfoHash(info any) (string, error) { // Take interface{}
+func CalculateInfoHash(info models.InfoDictionary) (string, error) {
 	var buf bytes.Buffer
 
-	err := bencode.Marshal(&buf, info) // Marshal the interface{}
+	err := bencode.Marshal(&buf, info)
+
 	if err != nil {
 		return "", fmt.Errorf("bencode marshal error: %w", err)
 	}

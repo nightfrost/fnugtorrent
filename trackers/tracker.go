@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/jackpal/bencode-go"
 	"nightfrost.com/fnugtorrent/models"
@@ -34,11 +35,14 @@ func BuildInitialTrackerRequest(trackerUrl string, infoHash string, peerID strin
 }
 
 func ProcessTrackerRequest(trackerRequestUrl string) ([]byte, error) {
-	response, err := http.Get(trackerRequestUrl)
+	var trackerUrlAsHttps = strings.Replace(trackerRequestUrl, "http://", "https://", 1)
+	response, err := http.Get(trackerUrlAsHttps)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	fmt.Println("raw response:", response)
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
